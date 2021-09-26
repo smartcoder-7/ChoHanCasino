@@ -1,0 +1,199 @@
+{
+  "contractName": "MetaCoin",
+  "abi": [],
+  "metadata": "{\"compiler\":{\"version\":\"0.8.0+commit.c7dfd78e\"},\"language\":\"Solidity\",\"output\":{\"abi\":[],\"devdoc\":{\"kind\":\"dev\",\"methods\":{},\"version\":1},\"userdoc\":{\"kind\":\"user\",\"methods\":{},\"version\":1}},\"settings\":{\"compilationTarget\":{\"/Volumes/Data/Projects/blocks/weave_test/contracts/MetaCoin.sol\":\"MetaCoin\"},\"evmVersion\":\"istanbul\",\"libraries\":{},\"metadata\":{\"bytecodeHash\":\"ipfs\"},\"optimizer\":{\"enabled\":false,\"runs\":200},\"remappings\":[]},\"sources\":{\"/Volumes/Data/Projects/blocks/weave_test/contracts/MetaCoin.sol\":{\"keccak256\":\"0x147eaf8bec34914e1a580a84ba12db47a55805776ddded8b362f1452d9b0b3e2\",\"license\":\"UNLICENSED\",\"urls\":[\"bzz-raw://7389e7b0d954b733dc88402d4d221d24eea09fd9a76d739e43d27cf067213c94\",\"dweb:/ipfs/QmWv4iAViLjrjN2WRRZkyweMJso9M3BgXL9dHuwucEBksR\"]}},\"version\":1}",
+  "bytecode": "0x6080604052607b600055348015601457600080fd5b50603f8060226000396000f3fe6080604052600080fdfea2646970667358221220b3a5ff8e2f99268eef636874e6a814088720e72a7c77ce4029f0475a96bb1bd064736f6c63430008000033",
+  "deployedBytecode": "0x6080604052600080fdfea2646970667358221220b3a5ff8e2f99268eef636874e6a814088720e72a7c77ce4029f0475a96bb1bd064736f6c63430008000033",
+  "immutableReferences": {},
+  "generatedSources": [],
+  "deployedGeneratedSources": [],
+  "sourceMap": "63:43:0:-:0;;;100:3;87:16;;63:43;;;;;;;;;;;;;;;;",
+  "deployedSourceMap": "63:43:0:-:0;;;;;",
+  "source": "//SPDX-License-Identifier: UNLICENSED\npragma solidity ^0.8.0;\n\ncontract MetaCoin {\n    uint256 kk = 123;\n}\n",
+  "sourcePath": "/Volumes/Data/Projects/blocks/weave_test/contracts/MetaCoin.sol",
+  "ast": {
+    "absolutePath": "/Volumes/Data/Projects/blocks/weave_test/contracts/MetaCoin.sol",
+    "exportedSymbols": {
+      "MetaCoin": [
+        5
+      ]
+    },
+    "id": 6,
+    "license": "UNLICENSED",
+    "nodeType": "SourceUnit",
+    "nodes": [
+      {
+        "id": 1,
+        "literals": [
+          "solidity",
+          "^",
+          "0.8",
+          ".0"
+        ],
+        "nodeType": "PragmaDirective",
+        "src": "38:23:0"
+      },
+      {
+        "abstract": false,
+        "baseContracts": [],
+        "contractDependencies": [],
+        "contractKind": "contract",
+        "fullyImplemented": true,
+        "id": 5,
+        "linearizedBaseContracts": [
+          5
+        ],
+        "name": "MetaCoin",
+        "nodeType": "ContractDefinition",
+        "nodes": [
+          {
+            "constant": false,
+            "id": 4,
+            "mutability": "mutable",
+            "name": "kk",
+            "nodeType": "VariableDeclaration",
+            "scope": 5,
+            "src": "87:16:0",
+            "stateVariable": true,
+            "storageLocation": "default",
+            "typeDescriptions": {
+              "typeIdentifier": "t_uint256",
+              "typeString": "uint256"
+            },
+            "typeName": {
+              "id": 2,
+              "name": "uint256",
+              "nodeType": "ElementaryTypeName",
+              "src": "87:7:0",
+              "typeDescriptions": {
+                "typeIdentifier": "t_uint256",
+                "typeString": "uint256"
+              }
+            },
+            "value": {
+              "hexValue": "313233",
+              "id": 3,
+              "isConstant": false,
+              "isLValue": false,
+              "isPure": true,
+              "kind": "number",
+              "lValueRequested": false,
+              "nodeType": "Literal",
+              "src": "100:3:0",
+              "typeDescriptions": {
+                "typeIdentifier": "t_rational_123_by_1",
+                "typeString": "int_const 123"
+              },
+              "value": "123"
+            },
+            "visibility": "internal"
+          }
+        ],
+        "scope": 6,
+        "src": "63:43:0"
+      }
+    ],
+    "src": "38:69:0"
+  },
+  "legacyAST": {
+    "absolutePath": "/Volumes/Data/Projects/blocks/weave_test/contracts/MetaCoin.sol",
+    "exportedSymbols": {
+      "MetaCoin": [
+        5
+      ]
+    },
+    "id": 6,
+    "license": "UNLICENSED",
+    "nodeType": "SourceUnit",
+    "nodes": [
+      {
+        "id": 1,
+        "literals": [
+          "solidity",
+          "^",
+          "0.8",
+          ".0"
+        ],
+        "nodeType": "PragmaDirective",
+        "src": "38:23:0"
+      },
+      {
+        "abstract": false,
+        "baseContracts": [],
+        "contractDependencies": [],
+        "contractKind": "contract",
+        "fullyImplemented": true,
+        "id": 5,
+        "linearizedBaseContracts": [
+          5
+        ],
+        "name": "MetaCoin",
+        "nodeType": "ContractDefinition",
+        "nodes": [
+          {
+            "constant": false,
+            "id": 4,
+            "mutability": "mutable",
+            "name": "kk",
+            "nodeType": "VariableDeclaration",
+            "scope": 5,
+            "src": "87:16:0",
+            "stateVariable": true,
+            "storageLocation": "default",
+            "typeDescriptions": {
+              "typeIdentifier": "t_uint256",
+              "typeString": "uint256"
+            },
+            "typeName": {
+              "id": 2,
+              "name": "uint256",
+              "nodeType": "ElementaryTypeName",
+              "src": "87:7:0",
+              "typeDescriptions": {
+                "typeIdentifier": "t_uint256",
+                "typeString": "uint256"
+              }
+            },
+            "value": {
+              "hexValue": "313233",
+              "id": 3,
+              "isConstant": false,
+              "isLValue": false,
+              "isPure": true,
+              "kind": "number",
+              "lValueRequested": false,
+              "nodeType": "Literal",
+              "src": "100:3:0",
+              "typeDescriptions": {
+                "typeIdentifier": "t_rational_123_by_1",
+                "typeString": "int_const 123"
+              },
+              "value": "123"
+            },
+            "visibility": "internal"
+          }
+        ],
+        "scope": 6,
+        "src": "63:43:0"
+      }
+    ],
+    "src": "38:69:0"
+  },
+  "compiler": {
+    "name": "solc",
+    "version": "0.8.0+commit.c7dfd78e.Emscripten.clang"
+  },
+  "networks": {},
+  "schemaVersion": "3.4.0",
+  "updatedAt": "2021-09-25T14:32:10.505Z",
+  "devdoc": {
+    "kind": "dev",
+    "methods": {},
+    "version": 1
+  },
+  "userdoc": {
+    "kind": "user",
+    "methods": {},
+    "version": 1
+  }
+}
