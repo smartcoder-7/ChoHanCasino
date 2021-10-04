@@ -25,6 +25,7 @@ contract ChoHanCasino {
     Bet[] public bets;
 
     event Won(bool _status, address _address, uint256 _amount);
+    event BetPlaced(bool _status);
 
     modifier onlyOwner() {
         require(msg.sender == owner);
@@ -50,13 +51,14 @@ contract ChoHanCasino {
     }
 
     function checkPlayerExists(address player) public view returns (bool) {
-        for (uint256 i = 0; i <= players.length; i++) {
+        if (players.length == 0) return false;
+        for (uint256 i = 0; i < players.length; i++) {
             if (players[i].playerAddress == player) return true;
         }
         return false;
     }
 
-    function bet(uint256 _numberSelected) public payable {
+    function bet(uint256 _numberSelected) public payable returns (bool) {
         //selected number has to be 1 or 0
         // 1 for even 0 for odd
         require(!checkPlayerExists(msg.sender));
@@ -73,6 +75,8 @@ contract ChoHanCasino {
         );
 
         totalBet += msg.value;
+        emit BetPlaced(true);
+        return true;
     }
 
     function betEnd() public onlyOwner {
