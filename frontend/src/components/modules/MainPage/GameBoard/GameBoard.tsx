@@ -23,10 +23,12 @@ const initialState = {
 };
 
 interface Props {
+  isAdmin: boolean;
   onBet: (values: FormValues) => void;
+  onEndBet: () => void;
 }
 
-export default function GameBoard({ onBet }: Props) {
+export default function GameBoard({ onBet, isAdmin, onEndBet }: Props) {
   const [values, setValues] = useState<FormValues>(initialState);
 
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -76,7 +78,14 @@ export default function GameBoard({ onBet }: Props) {
         </FormControl>
       </Box>
       <Box>
-        <Button onClick={handleSubmit}>Bet!</Button>
+        <Button onClick={handleSubmit} color="inherit">
+          Bet
+        </Button>
+        {isAdmin && (
+          <Button onClick={onEndBet} color="inherit">
+            End bet
+          </Button>
+        )}
       </Box>
     </Paper>
   );

@@ -7,7 +7,7 @@ contract ChoHanCasino {
     uint256 public totalBet;
     uint256 public minNumberPlayer = 2;
     uint256 public numberWinner = 2;
-    bool ended;
+    uint256 public numberOfPlayers;
 
     struct Player {
         uint256 id;
@@ -25,7 +25,8 @@ contract ChoHanCasino {
     Bet[] public bets;
 
     event Won(bool _status, address _address, uint256 _amount);
-    event BetPlaced(bool _status);
+    event BetPlaced(bool _status, uint256 totalBet, uint256 numberOfPlayers);
+    event BetEnded(bool _status);
 
     modifier onlyOwner() {
         require(msg.sender == owner);
@@ -45,9 +46,17 @@ contract ChoHanCasino {
         if (msg.sender == owner) selfdestruct(owner);
     }
 
-    function withdraw() public onlyOwner returns (bool) {
-        owner.transfer(address(this).balance);
-        return true;
+    function withdraw(address payable reciever, uint256 _amount)
+        public
+        onlyOwner
+        returns (bool)
+    {
+        if (_amount > 0) {
+            if (reciever.send(_amount)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     function checkPlayerExists(address player) public view returns (bool) {
@@ -73,16 +82,24 @@ contract ChoHanCasino {
                 payable(msg.sender)
             )
         );
+        numberOfPlayers = players.length;
 
         totalBet += msg.value;
-        emit BetPlaced(true);
+        emit BetPlaced(true, totalBet, numberOfPlayers);
         return true;
     }
 
     function betEnd() public onlyOwner {
-        generateNumberWinner();
-        distributePrizes(numberWinner);
+        require(numberOfPlayers > 0, "should be more than 1 player");
+
+        if (numberOfPlayers == 1) {
+            withdraw(players[0].playerAddress, totalBet);
+        } else {
+            generateNumberWinner();
+            distributePrizes(numberWinner);
+        }
         resetData();
+        emit BetEnded(true);
     }
 
     function generateNumberWinner() public {

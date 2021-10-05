@@ -5,7 +5,7 @@ import casinoContractAbi from '../../contracts/abis/ChoHanCasino.json';
 import getContract from '../utils/getContract';
 import { useActiveWeb3React } from './useConnect';
 
-const CASINO_ADDRESS = '0x9a228E6AbD82F5D12DCae51EC2Ef1bFeE9837D06';
+const CASINO_ADDRESS = '0x469f3850872D759c1D17F48EaFFA875848DCcdAD';
 
 export default function useContract(
   address: string | undefined,
