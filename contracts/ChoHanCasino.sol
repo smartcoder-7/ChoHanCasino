@@ -8,6 +8,7 @@ contract ChoHanCasino {
     uint256 public minNumberPlayer = 2;
     uint256 public numberWinner = 2;
     uint256 public numberOfPlayers;
+    uint256 public fee = 3; // percentage of winners
 
     struct Player {
         uint256 id;
@@ -44,6 +45,12 @@ contract ChoHanCasino {
 
     function kill() public {
         if (msg.sender == owner) selfdestruct(owner);
+    }
+
+    function setFee(uint256 _fee) public onlyOwner returns (uint256) {
+        require(_fee <= 100, "percentage should be less than 100");
+        fee = _fee;
+        return fee;
     }
 
     function withdraw(address payable reciever, uint256 _amount)
@@ -108,36 +115,44 @@ contract ChoHanCasino {
     }
 
     function distributePrizes(uint256 numberWin) public {
-        address[100] memory winners;
-        address[100] memory losers;
-        uint256 countWin = 0;
-        uint256 countLose = 0;
+        Player[100] memory winners;
+        Player[100] memory losers;
+        uint256 numberOfWinners = 0;
+        uint256 numberOfLosers = 0;
+
+        uint256 totalAmountFromWinners = 0; //will be used for caculating weight
 
         for (uint256 i = 0; i < players.length; i++) {
-            address playerAddress = players[i].playerAddress;
             if (players[i].numberSelected == numberWin) {
-                winners[countWin] = playerAddress;
-                countWin++;
+                winners[numberOfWinners] = players[i];
+                totalAmountFromWinners += players[i].amountBet;
+                numberOfWinners++;
             } else {
-                losers[countLose] = playerAddress;
-                countLose++;
+                losers[numberOfLosers] = players[i];
+                numberOfLosers++;
             }
             delete players[i];
         }
 
-        if (countWin != 0) {
-            uint256 winnerEtherAmount = totalBet / countWin;
+        if (winners.length > 0) {
+            for (uint256 j = 0; j < numberOfWinners; j++) {
+                if (winners[j].playerAddress != address(0)) {
+                    uint256 winnerEtherAmount = ((winners[j].amountBet /
+                        totalAmountFromWinners) *
+                        totalBet *
+                        (100 - fee)) / 100;
 
-            for (uint256 j = 0; j < countWin; j++) {
-                if (winners[j] != address(0)) {
-                    payable(winners[j]).transfer(winnerEtherAmount);
-                    emit Won(true, winners[j], winnerEtherAmount);
+                    payable(winners[j].playerAddress).transfer(
+                        winnerEtherAmount
+                    );
+                    emit Won(true, winners[j].playerAddress, winnerEtherAmount);
                 }
             }
         }
 
-        for (uint256 l = 0; l < losers.length; l++) {
-            if (losers[l] != address(0)) emit Won(false, losers[l], 0);
+        for (uint256 l = 0; l < numberOfLosers; l++) {
+            if (losers[l].playerAddress != address(0))
+                emit Won(false, losers[l].playerAddress, 0);
         }
     }
 
