@@ -86,31 +86,33 @@ contract('Casino', (accounts) => {
 
   describe('betEnd', async () => {
     it('should be ended by others except admin', async () => {
-      await casino.betEnd({ from: player1 }).should.be.rejectedWith(EVM_REVERT);
+      await casino.endBet({ from: player1 }).should.be.rejectedWith(EVM_REVERT);
     });
 
     it('should require owner ownership', async () => {
-      await casino.betEnd({from: player1}).should.be.rejectedWith(EVM_REVERT);
-    })
+      await casino.endBet({from: player1}).should.be.rejectedWith(EVM_REVERT);
+    });
 
     it('should end when requirements meet only for owner', async () => {
-      const { logs: events } = await casino.betEnd({from: admin});
+      const { logs: events } = await casino.endBet({from: admin});
       const promises = [
         casino.totalBet(),
         casino.numberWinner(),
         casino.bets(0),
+        casino.numberOfPlayers()
       ];
-      const [oldTotalBet, oldNumberWinner, bet] = await Promise.all(promises);
+      const [oldTotalBet, oldNumberWinner, bet, numberOfPlayers] = await Promise.all(promises);
       expect(oldTotalBet.toNumber()).to.be.eq(0);
       expect(oldNumberWinner.toNumber()).to.be.eq(2);
       expect(oldTotalBet.toNumber()).to.be.eq(0);
-
-      events.forEach(({event: name, args}) => {
-        expect(name).to.be.eq('Won');
-      });
+      expect(events[events.length - 1].event).to.be.eq('BetEnded');
 
       const balance = await web3.eth.getBalance(casino.address)
-      expect(balance).to.be.eq('0');
+      if (numberOfPlayers === 1) {
+        expect(Number(balance)).to.be.eq(0);
+      } else {
+        expect(Number(balance)).to.be.greaterThan(0);
+      }
     })
   })
 });

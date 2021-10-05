@@ -20,6 +20,7 @@ contract ChoHanCasino {
     struct Bet {
         uint256 numberWinner;
         uint256 totalBet;
+        uint256 numberOfPlayers;
     }
 
     Player[] public players;
@@ -96,7 +97,7 @@ contract ChoHanCasino {
         return true;
     }
 
-    function betEnd() public onlyOwner {
+    function endBet() public onlyOwner {
         require(numberOfPlayers > 0, "should be more than 1 player");
 
         if (numberOfPlayers == 1) {
@@ -158,8 +159,9 @@ contract ChoHanCasino {
 
     function resetData() public {
         delete players;
-        bets.push(Bet(numberWinner, totalBet));
+        bets.push(Bet(numberWinner, totalBet, numberOfPlayers));
         totalBet = 0;
         numberWinner = 2;
+        numberOfPlayers = 0;
     }
 }
