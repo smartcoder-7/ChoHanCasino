@@ -1,4 +1,11 @@
-import { Box, Button, Paper } from '@material-ui/core';
+import {
+  Box,
+  Button,
+  createStyles,
+  makeStyles,
+  Paper,
+  Theme,
+} from '@material-ui/core';
 import FormControl from '@material-ui/core/FormControl';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
 import FormLabel from '@material-ui/core/FormLabel';
@@ -28,7 +35,39 @@ interface Props {
   onEndBet: () => void;
 }
 
+const useStyles = makeStyles((theme: Theme) =>
+  createStyles({
+    buttonWrapper: {
+      display: 'flex',
+      justifyContent: 'space-around',
+      margin: 'auto',
+      width: '50%',
+    },
+    formLabel: {
+      fontSize: theme.typography.h6.fontSize,
+    },
+    formWrapper: {
+      alignItems: 'center',
+      display: 'flex',
+      flexDirection: 'column',
+      marginBottom: theme.spacing(3),
+    },
+    input: {
+      width: '100%',
+    },
+    radioWrapper: {
+      marginBottom: theme.spacing(3),
+      marginRight: theme.spacing(7),
+    },
+    root: {
+      paddingBottom: theme.spacing(4),
+      paddingTop: theme.spacing(5),
+    },
+  }),
+);
+
 export default function GameBoard({ onBet, isAdmin, onEndBet }: Props) {
+  const classes = useStyles();
   const [values, setValues] = useState<FormValues>(initialState);
 
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -43,10 +82,16 @@ export default function GameBoard({ onBet, isAdmin, onEndBet }: Props) {
   };
 
   return (
-    <Paper elevation={1}>
-      <Box>
-        <FormControl component="fieldset">
-          <FormLabel component="legend">Select your choice</FormLabel>
+    <Paper elevation={1} className={classes.root}>
+      <Box className={classes.formWrapper}>
+        <FormControl component="fieldset" className={classes.radioWrapper}>
+          <FormLabel
+            component="legend"
+            color="primary"
+            className={classes.formLabel}
+          >
+            Your choice:
+          </FormLabel>
           <RadioGroup
             aria-label="choice"
             name="choice"
@@ -66,7 +111,13 @@ export default function GameBoard({ onBet, isAdmin, onEndBet }: Props) {
           </RadioGroup>
         </FormControl>
         <FormControl component="fieldset">
-          <FormLabel component="legend">Input the amount to bet!</FormLabel>
+          <FormLabel
+            component="legend"
+            color="primary"
+            className={classes.formLabel}
+          >
+            Wager (ETH)
+          </FormLabel>
           <Input
             placeholder="Input the amount"
             type="number"
@@ -74,15 +125,16 @@ export default function GameBoard({ onBet, isAdmin, onEndBet }: Props) {
             onChange={handleChange}
             value={values.amount}
             required
+            className={classes.input}
           />
         </FormControl>
       </Box>
-      <Box>
-        <Button onClick={handleSubmit} color="inherit">
+      <Box className={classes.buttonWrapper}>
+        <Button onClick={handleSubmit} variant="contained" color="primary">
           Bet
         </Button>
         {isAdmin && (
-          <Button onClick={onEndBet} color="inherit">
+          <Button onClick={onEndBet} variant="contained" color="secondary">
             End bet
           </Button>
         )}

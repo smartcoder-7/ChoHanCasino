@@ -4,11 +4,10 @@ pragma solidity ^0.8.0;
 contract ChoHanCasino {
     address payable public owner;
     uint256 public minimumBet;
-    uint256 public totalBet;
     uint256 public minNumberPlayer = 2;
-    uint256 public numberWinner = 2;
-    uint256 public numberOfPlayers;
     uint256 public fee = 3; // percentage of winners
+    uint256 public numberOfPlayers;
+    uint256 public currentBetId; //also current bet
 
     struct Player {
         uint256 id;
@@ -18,9 +17,11 @@ contract ChoHanCasino {
     }
 
     struct Bet {
+        uint256 id;
         uint256 numberWinner;
         uint256 totalBet;
         uint256 numberOfPlayers;
+        bool ended;
     }
 
     Player[] public players;
@@ -38,6 +39,7 @@ contract ChoHanCasino {
     constructor(uint256 _mininumBet) {
         owner = payable(msg.sender);
         if (_mininumBet != 0) minimumBet = _mininumBet;
+        bets.push(Bet(0, 3, 0, 0, false));
     }
 
     fallback() external payable {}
@@ -92,8 +94,8 @@ contract ChoHanCasino {
         );
         numberOfPlayers = players.length;
 
-        totalBet += msg.value;
-        emit BetPlaced(true, totalBet, numberOfPlayers);
+        bets[currentBetId].totalBet += msg.value;
+        emit BetPlaced(true, bets[currentBetId].totalBet, numberOfPlayers);
         return true;
     }
 
@@ -101,10 +103,14 @@ contract ChoHanCasino {
         require(numberOfPlayers > 0, "should be more than 1 player");
 
         if (numberOfPlayers == 1) {
-            withdraw(players[0].playerAddress, totalBet);
+            withdraw(players[0].playerAddress, bets[currentBetId].totalBet);
+            bets[currentBetId].ended = true;
+            delete players;
+            bets.push(Bet(0, 3, 0, 0, false));
+            currentBetId++;
         } else {
             generateNumberWinner();
-            distributePrizes(numberWinner);
+            distributePrizes(bets[currentBetId].numberWinner);
         }
         resetData();
         emit BetEnded(true);
@@ -112,7 +118,7 @@ contract ChoHanCasino {
 
     function generateNumberWinner() public {
         uint256 numberGenerated = ((block.number % 36) + 1) % 2;
-        numberWinner = numberGenerated;
+        bets[currentBetId].numberWinner = numberGenerated;
     }
 
     function distributePrizes(uint256 numberWin) public {
@@ -140,7 +146,7 @@ contract ChoHanCasino {
                 if (winners[j].playerAddress != address(0)) {
                     uint256 winnerEtherAmount = ((winners[j].amountBet /
                         totalAmountFromWinners) *
-                        totalBet *
+                        bets[currentBetId].totalBet *
                         (100 - fee)) / 100;
 
                     payable(winners[j].playerAddress).transfer(
@@ -159,9 +165,9 @@ contract ChoHanCasino {
 
     function resetData() public {
         delete players;
-        bets.push(Bet(numberWinner, totalBet, numberOfPlayers));
-        totalBet = 0;
-        numberWinner = 2;
+        bets[currentBetId].ended = true;
+        bets.push(Bet(0, 3, 0, 0, false));
+        currentBetId++;
         numberOfPlayers = 0;
     }
 }

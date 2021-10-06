@@ -42,8 +42,10 @@ contract('Casino', (accounts) => {
   describe('bet', async () => {
    it('works normal', async () => {
      //we have already a player to bet that is admin
-     const BET_AMOUNT = '0.15';
-      const totalBet = web3.utils.fromWei(await casino.totalBet());
+      const BET_AMOUNT = '0.15';
+      const currentBetId = await casino.currentBetId();
+      const currentBet = await casino.bets(currentBetId);
+      const totalBet = web3.utils.fromWei(currentBet.totalBet);
       const {id, amountBet, numberSelected, playerAddress} = await casino.players(0);
 
       expect(totalBet).to.be.eq(BET_AMOUNT);
@@ -95,24 +97,12 @@ contract('Casino', (accounts) => {
 
     it('should end when requirements meet only for owner', async () => {
       const { logs: events } = await casino.endBet({from: admin});
-      const promises = [
-        casino.totalBet(),
-        casino.numberWinner(),
-        casino.bets(0),
-        casino.numberOfPlayers()
-      ];
-      const [oldTotalBet, oldNumberWinner, bet, numberOfPlayers] = await Promise.all(promises);
-      expect(oldTotalBet.toNumber()).to.be.eq(0);
-      expect(oldNumberWinner.toNumber()).to.be.eq(2);
-      expect(oldTotalBet.toNumber()).to.be.eq(0);
+      const currentBetId = await casino.currentBetId();
+      const oldBet = await casino.bets(currentBetId - 1);
+      const currentBet = await casino.bets(currentBetId);
+      expect(oldBet.ended).to.be.equal(true);
+      expect(currentBet.ended).to.be.equal(false);
       expect(events[events.length - 1].event).to.be.eq('BetEnded');
-
-      const balance = await web3.eth.getBalance(casino.address)
-      if (numberOfPlayers === 1) {
-        expect(Number(balance)).to.be.eq(0);
-      } else {
-        expect(Number(balance)).to.be.greaterThan(0);
-      }
     })
   })
 });
