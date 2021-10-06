@@ -39,7 +39,7 @@ contract ChoHanCasino {
     constructor(uint256 _mininumBet) {
         owner = payable(msg.sender);
         if (_mininumBet != 0) minimumBet = _mininumBet;
-        bets.push(Bet(0, 3, 0, 0, false));
+        bets.push(Bet(1, 3, 0, 0, false));
     }
 
     fallback() external payable {}

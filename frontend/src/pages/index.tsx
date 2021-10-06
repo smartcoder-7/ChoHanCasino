@@ -1,6 +1,6 @@
 import { Redirect, Route, Switch } from 'react-router-dom';
 
-import MainPage from './MainPage';
+import MainPage from './MainPage/MainPage.container';
 
 function ModuleRoutes() {
   return (

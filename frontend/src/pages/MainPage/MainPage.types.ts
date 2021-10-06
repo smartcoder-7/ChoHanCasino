@@ -1,18 +1,9 @@
-export interface GameStatus {
-  miniumBet: number;
-  numberOfPlayers: number;
-  numberWinner: number;
-  totalBet: number;
-}
+import { BigNumber } from 'ethers';
 
-export interface CallResult {
-  callResults: {
-    [chainId: number]: {
-      [callKey: string]: {
-        blockNumber?: number;
-        data?: string | null;
-        fetchingBlockNumber?: number;
-      };
-    };
-  };
+export interface Bet {
+  ended: boolean;
+  id: BigNumber;
+  numberOfPlayers: BigNumber;
+  numberWinner: BigNumber;
+  totalBet: BigNumber;
 }

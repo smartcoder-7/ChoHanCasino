@@ -1,3 +1,4 @@
+import CircularProgress from '@material-ui/core/CircularProgress';
 import { useWeb3React } from '@web3-react/core';
 import { useEffect, useState } from 'react';
 
@@ -7,6 +8,7 @@ import {
   useEagerConnect,
   useInactiveListener,
 } from '../../../lib/hooks/useConnect';
+import notifier from '../../../lib/utils/notifier';
 
 export default function Web3ReactManager({
   children,
@@ -52,9 +54,10 @@ export default function Web3ReactManager({
 
   // if the account context isn't active, and there's an error on the network context, it's an irrecoverable error
   if (!active && networkError) {
+    notifier.error('Something went wrong!');
     return (
       <div>
-        <div>{'unknownError'}</div>
+        <div>{'unknown error'}</div>
       </div>
     );
   }
@@ -63,7 +66,7 @@ export default function Web3ReactManager({
   if (!active && !networkActive) {
     return showLoader ? (
       <div>
-        <div>Loader</div>
+        <CircularProgress />
       </div>
     ) : null;
   }

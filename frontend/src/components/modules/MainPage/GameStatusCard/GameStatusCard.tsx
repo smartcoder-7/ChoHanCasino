@@ -9,7 +9,7 @@ import {
 } from '@material-ui/core';
 
 export interface GameStatusProps {
-  ended?: boolean;
+  ended: string;
   id: number;
   numberOfPlayers: number;
   numberWinner: number;
