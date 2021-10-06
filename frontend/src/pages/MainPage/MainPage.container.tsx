@@ -4,7 +4,9 @@ import {
   createStyles,
   makeStyles,
   Theme,
+  Typography,
 } from '@material-ui/core';
+import { useWeb3React } from '@web3-react/core';
 
 import { useCasinoContract } from '../../lib/hooks/useContract';
 import MainPage from './MainPage';
@@ -25,6 +27,15 @@ const useStyles = makeStyles((theme: Theme) =>
 function MainPageContainer() {
   const classes = useStyles();
   const casinoContract = useCasinoContract();
+  const { active } = useWeb3React();
+
+  if (!active) {
+    return (
+      <Container className={classes.root} maxWidth="md">
+        <Typography variant="h3">Please try to connect wallet!</Typography>
+      </Container>
+    );
+  }
 
   if (!casinoContract) {
     return (

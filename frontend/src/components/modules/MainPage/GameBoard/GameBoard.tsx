@@ -2,6 +2,7 @@ import {
   Box,
   Button,
   createStyles,
+  FormHelperText,
   makeStyles,
   Paper,
   Theme,
@@ -19,7 +20,7 @@ enum Option {
   EVEN = 1,
 }
 
-interface FormValues {
+export interface FormValues {
   amount: number;
   choice: number;
 }
@@ -31,6 +32,7 @@ const initialState = {
 
 interface Props {
   isAdmin: boolean;
+  mininumBet: number;
   onBet: (values: FormValues) => void;
   onEndBet: () => void;
 }
@@ -47,19 +49,21 @@ const useStyles = makeStyles((theme: Theme) =>
       fontSize: theme.typography.h6.fontSize,
     },
     formWrapper: {
-      alignItems: 'center',
       display: 'flex',
       flexDirection: 'column',
       marginBottom: theme.spacing(3),
     },
     input: {
-      width: '100%',
+      maxWidth: 300,
     },
     radioWrapper: {
       marginBottom: theme.spacing(3),
       marginRight: theme.spacing(7),
     },
     root: {
+      alignItems: 'center',
+      display: 'flex',
+      flexDirection: 'column',
       paddingBottom: theme.spacing(4),
       paddingTop: theme.spacing(5),
     },
@@ -69,8 +73,10 @@ const useStyles = makeStyles((theme: Theme) =>
 export default function GameBoard({ onBet, isAdmin, onEndBet }: Props) {
   const classes = useStyles();
   const [values, setValues] = useState<FormValues>(initialState);
+  const [error, setError] = useState('');
 
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    error && setError('');
     setValues((old: FormValues) => ({
       ...old,
       [event.target.name as keyof FormValues]: +event.target.value,
@@ -78,12 +84,16 @@ export default function GameBoard({ onBet, isAdmin, onEndBet }: Props) {
   };
 
   const handleSubmit = () => {
+    if (values.amount <= 0) {
+      setError('Amount has to be greater than min amount');
+      return;
+    }
     onBet(values);
   };
 
   return (
     <Paper elevation={1} className={classes.root}>
-      <Box className={classes.formWrapper}>
+      <Box className={classes.formWrapper} px={10}>
         <FormControl component="fieldset" className={classes.radioWrapper}>
           <FormLabel
             component="legend"
@@ -127,6 +137,7 @@ export default function GameBoard({ onBet, isAdmin, onEndBet }: Props) {
             required
             className={classes.input}
           />
+          {error && <FormHelperText error>{error}</FormHelperText>}
         </FormControl>
       </Box>
       <Box className={classes.buttonWrapper}>

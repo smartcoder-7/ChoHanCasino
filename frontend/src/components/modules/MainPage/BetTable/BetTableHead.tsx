@@ -2,12 +2,12 @@ import { TableCell, TableRow } from '@material-ui/core';
 import TableHead from '@material-ui/core/TableHead';
 import TableSortLabel from '@material-ui/core/TableSortLabel';
 
-import { GameStatusProps } from '../GameStatusCard/GameStatusCard';
+import { GameStatus } from '../../../../pages/MainPage/MainPage.types';
 import { useStyles } from './BetTable';
 import { Order } from './BetTable.utils';
 
 export interface HeadCell {
-  id: keyof GameStatusProps;
+  id: keyof GameStatus;
   label: string;
   numeric: boolean;
 }
@@ -17,7 +17,7 @@ interface TableHeadProps {
   headCells: HeadCell[];
   onRequestSort: (
     event: React.MouseEvent<unknown>,
-    property: keyof GameStatusProps,
+    property: keyof GameStatus,
   ) => void;
   order: Order;
   orderBy: string;
@@ -32,7 +32,7 @@ export default function BetTableHead({
   headCells,
 }: TableHeadProps) {
   const createSortHandler =
-    (property: keyof GameStatusProps) => (event: React.MouseEvent<unknown>) => {
+    (property: keyof GameStatus) => (event: React.MouseEvent<unknown>) => {
       onRequestSort(event, property);
     };
 

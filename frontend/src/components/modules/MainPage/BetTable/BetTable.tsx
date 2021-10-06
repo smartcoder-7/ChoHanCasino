@@ -15,7 +15,7 @@ import Toolbar from '@material-ui/core/Toolbar';
 import Typography from '@material-ui/core/Typography';
 import { useState } from 'react';
 
-import { GameStatusProps } from '../GameStatusCard/GameStatusCard';
+import { GameStatus } from '../../../../pages/MainPage/MainPage.types';
 import { getComparator, Order, stableSort } from './BetTable.utils';
 import BetTableHead, { HeadCell } from './BetTableHead';
 
@@ -86,19 +86,19 @@ export const useStyles = makeStyles((theme: Theme) =>
 
 interface TableProps {
   headCells: HeadCell[];
-  rows: GameStatusProps[];
+  rows: GameStatus[];
 }
 
 export default function BetTable({ rows, headCells }: TableProps) {
   const classes = useStyles();
   const [order, setOrder] = useState<Order>('asc');
-  const [orderBy, setOrderBy] = useState<keyof GameStatusProps>('id');
+  const [orderBy, setOrderBy] = useState<keyof GameStatus>('id');
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
 
   const handleRequestSort = (
     event: React.MouseEvent<unknown>,
-    property: keyof GameStatusProps,
+    property: keyof GameStatus,
   ) => {
     const isAsc = orderBy === property && order === 'asc';
     setOrder(isAsc ? 'desc' : 'asc');

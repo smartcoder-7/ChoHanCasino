@@ -40,6 +40,7 @@ function MainPage() {
                 onBet={handleBet}
                 isAdmin={isAdmin}
                 onEndBet={handleEndBet}
+                mininumBet={gameStatus?.minimumBet || 0}
               />
             </Box>
           </Grid>

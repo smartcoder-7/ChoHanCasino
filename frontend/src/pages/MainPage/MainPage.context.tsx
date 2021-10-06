@@ -8,8 +8,10 @@ import {
   useState,
 } from 'react';
 
+import { FormValues } from '../../components/modules/MainPage/GameBoard/GameBoard';
 import { GameStatusProps } from '../../components/modules/MainPage/GameStatusCard/GameStatusCard';
 import { createContext } from '../../lib/utils/context';
+import { GameStatus } from './MainPage.types';
 import { mapToGameStatus } from './MainPage.utils';
 
 const ADMIN_ADDRESS = '0xABd2b1DF2AA03Df2c804af40A73BeddA8148588E';
@@ -21,11 +23,11 @@ interface Props {
 
 interface MainPageContextProps {
   gameStatus: GameStatusProps | null;
-  handleBet: () => void;
+  handleBet: (values: FormValues) => void;
   handleEndBet: () => void;
   isAdmin: boolean;
   setGameStatus: Dispatch<SetStateAction<GameStatusProps | null>>;
-  tableData: GameStatusProps[];
+  tableData: GameStatus[];
 }
 
 const MainPageContext = createContext<MainPageContextProps>();
@@ -38,8 +40,9 @@ function useContextSetup({
   const { account } = useWeb3React();
 
   const [gameStatus, setGameStatus] = useState<GameStatusProps | null>(null);
-  const [tableData, setTableData] = useState<GameStatusProps[]>([]);
+  const [tableData, setTableData] = useState<GameStatus[]>([]);
 
+  //listen to events
   useEffect(() => {
     if (!contract) {
       return;
@@ -62,8 +65,7 @@ function useContextSetup({
     (async () => {
       const currentBetId = await contract.currentBetId();
       const currentBet = await contract.bets(currentBetId);
-
-      console.info('currentBetId', currentBetId.toNumber());
+      const minimumBet = await contract.minimumBet();
 
       const promises = Array(currentBetId)
         .fill(0)
@@ -73,17 +75,20 @@ function useContextSetup({
 
       const results = await Promise.all(promises);
       setTableData(results.map((result) => mapToGameStatus(result)));
-      setGameStatus(mapToGameStatus(currentBet));
+      setGameStatus({
+        ...mapToGameStatus(currentBet),
+        minimumBet: parseFloat(utils.formatUnits(minimumBet, 18).toString()),
+      });
     })();
   }, [contract]);
 
-  const handleBet = async () => {
+  const handleBet = async ({ amount, choice }: FormValues) => {
     try {
       const overrides = {
         from: account,
-        value: utils.parseEther('0.1'),
+        value: utils.parseEther(amount + ''),
       };
-      await contract.bet(0, overrides);
+      await contract.bet(choice, overrides);
     } catch (error) {
       console.error('error');
     }

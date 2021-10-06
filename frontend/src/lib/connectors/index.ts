@@ -24,6 +24,7 @@ export const network = new NetworkConnector({
 let networkLibrary: Web3Provider | undefined;
 export function getNetworkLibrary(): Web3Provider {
   return (networkLibrary =
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     networkLibrary ?? new Web3Provider(network.provider as any));
 }
 

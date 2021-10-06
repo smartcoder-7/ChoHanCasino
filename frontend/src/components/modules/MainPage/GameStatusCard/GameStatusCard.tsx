@@ -8,12 +8,10 @@ import {
   Typography,
 } from '@material-ui/core';
 
-export interface GameStatusProps {
-  ended: string;
-  id: number;
-  numberOfPlayers: number;
-  numberWinner: number;
-  totalBet: number;
+import { GameStatus } from '../../../../pages/MainPage/MainPage.types';
+
+export interface GameStatusProps extends GameStatus {
+  minimumBet: number;
 }
 
 const useStyles = makeStyles(() =>
@@ -50,6 +48,7 @@ export default function GameStatusCard({
   id,
   numberOfPlayers,
   totalBet,
+  minimumBet,
 }: GameStatusProps) {
   return (
     <Card>
@@ -69,6 +68,7 @@ export default function GameStatusCard({
             unit={'people'}
           />
           <DataRow label="Total amount" value={totalBet} unit={'ETH'} />
+          <DataRow label="Min-bet amount" value={minimumBet} unit={'ETH'} />
         </CardContent>
       </Card>
     </Card>

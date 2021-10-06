@@ -6,9 +6,11 @@ import Toolbar from '@material-ui/core/Toolbar';
 import Typography from '@material-ui/core/Typography';
 import MenuIcon from '@material-ui/icons/Menu';
 import { useWeb3React } from '@web3-react/core';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 
 import Link from '../../../components/global/Link';
+import { SUPPORTED_WALLETS } from '../../../lib/constants';
+import notifier from '../../../lib/utils/notifier';
 
 const useStyles = makeStyles((theme) => ({
   menuButton: {
@@ -50,7 +52,7 @@ function ConnectedMenu({
 
 export default function Header() {
   const classes = useStyles();
-  const { active, account, deactivate } = useWeb3React();
+  const { active, account, deactivate, activate } = useWeb3React();
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
 
   const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
@@ -66,6 +68,19 @@ export default function Header() {
     await deactivate();
   };
 
+  const handleLogin = async () => {
+    SUPPORTED_WALLETS['METAMASK'].connector &&
+      (await activate(SUPPORTED_WALLETS['METAMASK'].connector));
+  };
+
+  useEffect(() => {
+    if (active) {
+      notifier.success('Wallet has been connected.');
+    } else {
+      notifier.info('Wallet has been connected.');
+    }
+  }, [active]);
+
   const rightElement = active ? (
     <>
       <Button color="inherit" onClick={handleClick}>
@@ -80,7 +95,9 @@ export default function Header() {
       />
     </>
   ) : (
-    <Button color="inherit">Login</Button>
+    <Button color="inherit" onClick={handleLogin}>
+      Login
+    </Button>
   );
 
   return (

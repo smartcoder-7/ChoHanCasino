@@ -1,10 +1,9 @@
 import { utils } from 'ethers';
 
 import { HeadCell } from '../../components/modules/MainPage/BetTable/BetTableHead';
-import { GameStatusProps } from '../../components/modules/MainPage/GameStatusCard/GameStatusCard';
-import { Bet } from './MainPage.types';
+import { Bet, GameStatus } from './MainPage.types';
 
-export const mapToGameStatus = (bet: Bet): GameStatusProps => ({
+export const mapToGameStatus = (bet: Bet): GameStatus => ({
   ended: bet.ended ? 'Ended' : 'In progress',
   id: bet.id.toNumber(),
   numberOfPlayers: bet.numberOfPlayers.toNumber(),
