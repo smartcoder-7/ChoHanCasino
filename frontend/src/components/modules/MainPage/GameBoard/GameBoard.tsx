@@ -32,6 +32,7 @@ const initialState = {
 
 interface Props {
   isAdmin: boolean;
+  isLoading: boolean;
   mininumBet: number;
   onBet: (values: FormValues) => void;
   onEndBet: () => void;
@@ -70,7 +71,7 @@ const useStyles = makeStyles((theme: Theme) =>
   }),
 );
 
-export default function GameBoard({ onBet, isAdmin, onEndBet }: Props) {
+function GameBoard({ onBet, isAdmin, onEndBet, isLoading }: Props) {
   const classes = useStyles();
   const [values, setValues] = useState<FormValues>(initialState);
   const [error, setError] = useState('');
@@ -141,11 +142,21 @@ export default function GameBoard({ onBet, isAdmin, onEndBet }: Props) {
         </FormControl>
       </Box>
       <Box className={classes.buttonWrapper}>
-        <Button onClick={handleSubmit} variant="contained" color="primary">
+        <Button
+          onClick={handleSubmit}
+          variant="contained"
+          color="primary"
+          disabled={isLoading}
+        >
           Bet
         </Button>
         {isAdmin && (
-          <Button onClick={onEndBet} variant="contained" color="secondary">
+          <Button
+            onClick={onEndBet}
+            variant="contained"
+            color="secondary"
+            disabled={isLoading}
+          >
             End bet
           </Button>
         )}
@@ -153,3 +164,5 @@ export default function GameBoard({ onBet, isAdmin, onEndBet }: Props) {
     </Paper>
   );
 }
+
+export default GameBoard;

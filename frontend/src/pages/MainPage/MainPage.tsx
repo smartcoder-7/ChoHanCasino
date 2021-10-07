@@ -27,7 +27,7 @@ const useStyles = makeStyles((theme: Theme) =>
 
 function MainPage() {
   const classes = useStyles();
-  const { handleBet, handleEndBet, isAdmin, gameStatus, tableData } =
+  const { handleBet, handleEndBet, isAdmin, gameStatus, tableData, isLoading } =
     useMainPageContext();
 
   return (
@@ -39,6 +39,7 @@ function MainPage() {
               <GameBoard
                 onBet={handleBet}
                 isAdmin={isAdmin}
+                isLoading={isLoading}
                 onEndBet={handleEndBet}
                 mininumBet={gameStatus?.minimumBet || 0}
               />

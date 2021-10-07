@@ -10,11 +10,11 @@ import {
 
 import { FormValues } from '../../components/modules/MainPage/GameBoard/GameBoard';
 import { GameStatusProps } from '../../components/modules/MainPage/GameStatusCard/GameStatusCard';
+import config from '../../config';
 import { createContext } from '../../lib/utils/context';
+import notifier from '../../lib/utils/notifier';
 import { GameStatus } from './MainPage.types';
 import { mapToGameStatus } from './MainPage.utils';
-
-const ADMIN_ADDRESS = '0xABd2b1DF2AA03Df2c804af40A73BeddA8148588E';
 
 interface Props {
   children: ReactNode;
@@ -26,6 +26,7 @@ interface MainPageContextProps {
   handleBet: (values: FormValues) => void;
   handleEndBet: () => void;
   isAdmin: boolean;
+  isLoading: boolean;
   setGameStatus: Dispatch<SetStateAction<GameStatusProps | null>>;
   tableData: GameStatus[];
 }
@@ -38,7 +39,7 @@ function useContextSetup({
   contract: Contract;
 }): MainPageContextProps {
   const { account } = useWeb3React();
-
+  const [isLoading, setIsLoading] = useState<boolean>(false);
   const [gameStatus, setGameStatus] = useState<GameStatusProps | null>(null);
   const [tableData, setTableData] = useState<GameStatus[]>([]);
 
@@ -62,53 +63,69 @@ function useContextSetup({
     if (!contract) {
       return;
     }
-    (async () => {
-      const currentBetId = await contract.currentBetId();
-      const currentBet = await contract.bets(currentBetId);
-      const minimumBet = await contract.minimumBet();
+    try {
+      setIsLoading(true);
+      (async () => {
+        const currentBetId = await contract.currentBetId();
+        const currentBet = await contract.bets(currentBetId);
+        const minimumBet = await contract.minimumBet();
 
-      const promises = Array(currentBetId)
-        .fill(0)
-        .map((_, index) => {
-          return contract.bets(index);
+        const promises = Array(currentBetId)
+          .fill(0)
+          .map((_, index) => {
+            return contract.bets(index);
+          });
+
+        const results = await Promise.all(promises);
+        setTableData(results.map((result) => mapToGameStatus(result)));
+        setGameStatus({
+          ...mapToGameStatus(currentBet),
+          minimumBet: parseFloat(utils.formatUnits(minimumBet, 18).toString()),
         });
-
-      const results = await Promise.all(promises);
-      setTableData(results.map((result) => mapToGameStatus(result)));
-      setGameStatus({
-        ...mapToGameStatus(currentBet),
-        minimumBet: parseFloat(utils.formatUnits(minimumBet, 18).toString()),
-      });
-    })();
+      })();
+    } catch (error) {
+      notifier.error('Something went wrong!');
+    } finally {
+      setIsLoading(false);
+    }
   }, [contract]);
 
   const handleBet = async ({ amount, choice }: FormValues) => {
     try {
+      setIsLoading(true);
       const overrides = {
         from: account,
         value: utils.parseEther(amount + ''),
       };
       await contract.bet(choice, overrides);
     } catch (error) {
+      notifier.error('Something went wrong!');
       console.error('error');
+    } finally {
+      setIsLoading(false);
     }
   };
 
   const handleEndBet = async () => {
     try {
+      setIsLoading(true);
       await contract.betEnd();
     } catch (error) {
+      notifier.error('Something went wrong!');
       console.error('error', error);
+    } finally {
+      setIsLoading(false);
     }
   };
 
-  const isAdmin = ADMIN_ADDRESS === account;
+  const isAdmin = config.adminAddress === account;
 
   return {
     gameStatus,
     handleBet,
     handleEndBet,
     isAdmin,
+    isLoading,
     setGameStatus,
     tableData,
   };

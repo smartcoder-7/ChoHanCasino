@@ -1,11 +1,10 @@
 import { Contract, ContractInterface } from '@ethersproject/contracts';
 import { useMemo } from 'react';
 
+import config from '../../config';
 import casinoContractAbi from '../../contracts/abis/ChoHanCasino.json';
 import getContract from '../utils/getContract';
 import { useActiveWeb3React } from './useConnect';
-
-const CASINO_ADDRESS = '0xa2c85B6A6F5497B3b10489435F40467941655ca3';
 
 export default function useContract(
   address: string | undefined,
@@ -33,5 +32,5 @@ export default function useContract(
 }
 
 export function useCasinoContract(): Contract | null {
-  return useContract(CASINO_ADDRESS, casinoContractAbi.abi);
+  return useContract(config.casinoContractAddress, casinoContractAbi.abi);
 }

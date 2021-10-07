@@ -8,28 +8,47 @@ contract ChoHanCasino {
     uint256 public fee = 3; // percentage of winners
     uint256 public numberOfPlayers;
     uint256 public currentBetId; //also current bet
+    uint256 private nonce; // for generating random numbers
+
+    enum Pairity {
+        Even,
+        Odd,
+        Default
+    }
+
+    enum Result {
+        Won,
+        Lost
+    }
+
+    struct Pair {
+        uint256 dice1;
+        uint256 dice2;
+    }
 
     struct Player {
         uint256 id;
         uint256 amountBet;
-        uint256 numberSelected;
+        Pairity pairity;
         address payable playerAddress;
     }
 
     struct Bet {
         uint256 id;
-        uint256 numberWinner;
+        Pairity pairity;
         uint256 totalBet;
         uint256 numberOfPlayers;
         bool ended;
+        Pair pair;
     }
 
+    mapping(address => Player) public PlayersInfo;
     Player[] public players;
     Bet[] public bets;
 
-    event Won(bool _status, address _address, uint256 _amount);
+    event BetResult(Result _status, address _address, uint256 _amount);
     event BetPlaced(bool _status, uint256 totalBet, uint256 numberOfPlayers);
-    event BetEnded(bool _status);
+    event BetEnded(Bet lastBet);
 
     modifier onlyOwner() {
         require(msg.sender == owner);
@@ -39,7 +58,7 @@ contract ChoHanCasino {
     constructor(uint256 _mininumBet) {
         owner = payable(msg.sender);
         if (_mininumBet != 0) minimumBet = _mininumBet;
-        bets.push(Bet(1, 3, 0, 0, false));
+        bets.push(Bet(1, Pairity.Default, 0, 0, false, Pair(0, 0)));
     }
 
     fallback() external payable {}
@@ -77,23 +96,23 @@ contract ChoHanCasino {
         return false;
     }
 
-    function bet(uint256 _numberSelected) public payable returns (bool) {
+    function bet(Pairity _pairity) public payable returns (bool) {
         //selected number has to be 1 or 0
         // 1 for even 0 for odd
         require(!checkPlayerExists(msg.sender));
-        require(_numberSelected <= 1);
+        require(uint8(_pairity) <= 1);
         require(msg.value >= minimumBet);
 
-        players.push(
-            Player(
-                players.length,
-                msg.value,
-                _numberSelected,
-                payable(msg.sender)
-            )
+        Player memory newPlayer = Player(
+            players.length,
+            msg.value,
+            _pairity,
+            payable(msg.sender)
         );
+        players.push(newPlayer);
+        PlayersInfo[msg.sender] = newPlayer;
         numberOfPlayers = players.length;
-
+        bets[currentBetId].numberOfPlayers += players.length;
         bets[currentBetId].totalBet += msg.value;
         emit BetPlaced(true, bets[currentBetId].totalBet, numberOfPlayers);
         return true;
@@ -106,22 +125,37 @@ contract ChoHanCasino {
             withdraw(players[0].playerAddress, bets[currentBetId].totalBet);
             bets[currentBetId].ended = true;
             delete players;
-            bets.push(Bet(0, 3, 0, 0, false));
+            bets.push(Bet(0, Pairity.Default, 0, 0, false, Pair(0, 0)));
             currentBetId++;
         } else {
-            generateNumberWinner();
-            distributePrizes(bets[currentBetId].numberWinner);
+            generatePairity();
+            distributePrizes(bets[currentBetId].pairity);
         }
         resetData();
-        emit BetEnded(true);
+        emit BetEnded(bets[currentBetId - 1]);
     }
 
-    function generateNumberWinner() public {
-        uint256 numberGenerated = ((block.number % 36) + 1) % 2;
-        bets[currentBetId].numberWinner = numberGenerated;
+    function rollDice() internal returns (uint256) {
+        uint256 randomnumber = ((
+            uint256(
+                keccak256(
+                    abi.encodePacked(block.timestamp, block.difficulty, nonce)
+                )
+            )
+        ) % 6) + 1;
+        nonce++;
+        return randomnumber;
     }
 
-    function distributePrizes(uint256 numberWin) public {
+    function generatePairity() public {
+        bets[currentBetId].pair.dice1 = rollDice();
+        bets[currentBetId].pair.dice2 = rollDice();
+        bets[currentBetId].pairity = Pairity(
+            (bets[currentBetId].pair.dice1 + bets[currentBetId].pair.dice2) % 2
+        );
+    }
+
+    function distributePrizes(Pairity _pairity) public {
         Player[100] memory winners;
         Player[100] memory losers;
         uint256 numberOfWinners = 0;
@@ -130,7 +164,7 @@ contract ChoHanCasino {
         uint256 totalAmountFromWinners = 0; //will be used for caculating weight
 
         for (uint256 i = 0; i < players.length; i++) {
-            if (players[i].numberSelected == numberWin) {
+            if (players[i].pairity == _pairity) {
                 winners[numberOfWinners] = players[i];
                 totalAmountFromWinners += players[i].amountBet;
                 numberOfWinners++;
@@ -138,6 +172,7 @@ contract ChoHanCasino {
                 losers[numberOfLosers] = players[i];
                 numberOfLosers++;
             }
+            delete PlayersInfo[players[i].playerAddress];
             delete players[i];
         }
 
@@ -152,21 +187,25 @@ contract ChoHanCasino {
                     payable(winners[j].playerAddress).transfer(
                         winnerEtherAmount
                     );
-                    emit Won(true, winners[j].playerAddress, winnerEtherAmount);
+                    emit BetResult(
+                        Result.Won,
+                        winners[j].playerAddress,
+                        winnerEtherAmount
+                    );
                 }
             }
         }
 
         for (uint256 l = 0; l < numberOfLosers; l++) {
             if (losers[l].playerAddress != address(0))
-                emit Won(false, losers[l].playerAddress, 0);
+                emit BetResult(Result.Lost, losers[l].playerAddress, 0);
         }
     }
 
     function resetData() public {
         delete players;
         bets[currentBetId].ended = true;
-        bets.push(Bet(0, 3, 0, 0, false));
+        bets.push(Bet(0, Pairity.Default, 0, 0, false, Pair(0, 0)));
         currentBetId++;
         numberOfPlayers = 0;
     }

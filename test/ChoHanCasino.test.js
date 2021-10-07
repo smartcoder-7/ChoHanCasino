@@ -46,12 +46,12 @@ contract('Casino', (accounts) => {
       const currentBetId = await casino.currentBetId();
       const currentBet = await casino.bets(currentBetId);
       const totalBet = web3.utils.fromWei(currentBet.totalBet);
-      const {id, amountBet, numberSelected, playerAddress} = await casino.players(0);
+      const {id, amountBet, pairity, playerAddress} = await casino.PlayersInfo(admin);
 
       expect(totalBet).to.be.eq(BET_AMOUNT);
       expect(id.toNumber()).to.be.eq(0);
       expect(web3.utils.fromWei(amountBet)).to.be.eq(BET_AMOUNT);
-      expect(numberSelected.toNumber()).to.be.eq(1);
+      expect(pairity.toNumber()).to.be.eq(1);
       expect(playerAddress).to.be.eq(admin);
     });
 
@@ -79,12 +79,23 @@ contract('Casino', (accounts) => {
         casino.bet(1, {from: player2, value: betAmount}),
       ];
       const results = await Promise.all(promises);
+      const numberOfPlayers = await casino.numberOfPlayers();
 
       results.forEach(result => {
         expect(result.logs[0].event).to.be.eq('BetPlaced');
       })
-    })
+      expect(numberOfPlayers.toNumber()).to.be.equal(3);
+    });
   });
+
+  //in order to test internal function make it public
+  // describe('roll dice', async () => {
+  //   it('should result in a number between 1 ~ 6', async () => {
+  //     const result = await casino.rollDice.call();
+  //     console.log('result', result.toNumber())
+  //     expect(result.toNumber()).to.be.greaterThan(0).lessThan(7);
+  //   });
+  // })
 
   describe('betEnd', async () => {
     it('should be ended by others except admin', async () => {
@@ -102,7 +113,12 @@ contract('Casino', (accounts) => {
       const currentBet = await casino.bets(currentBetId);
       expect(oldBet.ended).to.be.equal(true);
       expect(currentBet.ended).to.be.equal(false);
-      expect(events[events.length - 1].event).to.be.eq('BetEnded');
+      const lastEvent = events[events.length - 1];
+      expect(lastEvent.event).to.be.eq('BetEnded');
+      expect(lastEvent.args[0].ended).to.be.equal(true);
+      expect(lastEvent.args[0].pairity).to.be.not.equal(2); // not equal default
+      expect(Number(lastEvent.args[0].pair['dice1'])).to.be.greaterThanOrEqual(1).lessThanOrEqual(6);
+      expect(Number(lastEvent.args[0].pair['dice2'])).to.be.greaterThanOrEqual(1).lessThanOrEqual(6);
     })
   })
 });

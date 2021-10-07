@@ -77,7 +77,7 @@ export default function Header() {
     if (active) {
       notifier.success('Wallet has been connected.');
     } else {
-      notifier.info('Wallet has been connected.');
+      notifier.info('Wallet has been disconnected.');
     }
   }, [active]);
 
@@ -96,7 +96,7 @@ export default function Header() {
     </>
   ) : (
     <Button color="inherit" onClick={handleLogin}>
-      Login
+      Connect
     </Button>
   );
 
