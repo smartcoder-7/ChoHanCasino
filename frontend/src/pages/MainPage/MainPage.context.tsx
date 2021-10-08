@@ -13,7 +13,7 @@ import { GameStatusProps } from '../../components/modules/MainPage/GameStatusCar
 import config from '../../config';
 import { createContext } from '../../lib/utils/context';
 import notifier from '../../lib/utils/notifier';
-import { GameStatus } from './MainPage.types';
+import { CasinoEvent, GameStatus } from './MainPage.types';
 import { mapToGameStatus } from './MainPage.utils';
 
 interface Props {
@@ -49,11 +49,18 @@ function useContextSetup({
       return;
     }
 
-    contract.on('BetPlaced', (status, totalBet, numberOfPlayers, event) => {
-      console.info('Bet placed', status, totalBet, numberOfPlayers, event);
+    contract.on(
+      CasinoEvent.BET_PLACED,
+      (status, totalBet, numberOfPlayers, event) => {
+        console.info('Bet placed', status, totalBet, numberOfPlayers, event);
+      },
+    );
+
+    contract.on(CasinoEvent.BET_RESULT, (status, address, amount) => {
+      console.info('Won event', status, address, amount);
     });
 
-    contract.on('Won', (status, address, amount) => {
+    contract.on(CasinoEvent.BET_ENDED, (status, address, amount) => {
       console.info('Won event', status, address, amount);
     });
   }, [contract]);
@@ -69,6 +76,7 @@ function useContextSetup({
         const currentBetId = await contract.currentBetId();
         const currentBet = await contract.bets(currentBetId);
         const minimumBet = await contract.minimumBet();
+        // const player = await contract.playersInfo(account);
 
         const promises = Array(currentBetId)
           .fill(0)

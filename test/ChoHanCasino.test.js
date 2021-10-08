@@ -46,7 +46,7 @@ contract('Casino', (accounts) => {
       const currentBetId = await casino.currentBetId();
       const currentBet = await casino.bets(currentBetId);
       const totalBet = web3.utils.fromWei(currentBet.totalBet);
-      const {id, amountBet, pairity, playerAddress} = await casino.PlayersInfo(admin);
+      const {id, amountBet, pairity, playerAddress} = await casino.playersInfo(admin);
 
       expect(totalBet).to.be.eq(BET_AMOUNT);
       expect(id.toNumber()).to.be.eq(0);

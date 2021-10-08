@@ -60,12 +60,15 @@ function TableToolbar({ title }: { title: string }) {
 
 export const useStyles = makeStyles((theme: Theme) =>
   createStyles({
-    root: {
-      width: '100%',
+    noData: {
+      textAlign: 'center',
     },
     paper: {
       width: '100%',
       marginBottom: theme.spacing(2),
+    },
+    root: {
+      width: '100%',
     },
     table: {
       minWidth: 750,
@@ -164,22 +167,25 @@ export default function BetTable({ rows, headCells }: TableProps) {
                           {row.numberOfPlayers}
                         </TableCell>
                         <TableCell align="right">{row.totalBet}</TableCell>
-                        <TableCell align="right">{row.numberWinner}</TableCell>
                         <TableCell align="left">{row.ended}</TableCell>
+                        <TableCell align="left">{row.pair}</TableCell>
+                        <TableCell align="left">{row.pairity}</TableCell>
                       </TableRow>
                     );
                   })
               ) : (
                 <TableRow>
-                  <TableCell component="th" scope="row" colSpan={5}>
-                    <Typography>No table data!</Typography>
+                  <TableCell component="th" scope="row" colSpan={7}>
+                    <Typography className={classes.noData} variant="h6">
+                      No table data!
+                    </Typography>
                   </TableCell>
                 </TableRow>
               )}
 
               {emptyRows > 0 && (
                 <TableRow style={{ height: 33 * emptyRows }}>
-                  <TableCell colSpan={6} />
+                  <TableCell colSpan={7} />
                 </TableRow>
               )}
             </TableBody>

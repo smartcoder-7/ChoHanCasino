@@ -42,12 +42,12 @@ contract ChoHanCasino {
         Pair pair;
     }
 
-    mapping(address => Player) public PlayersInfo;
+    mapping(address => Player) public playersInfo;
     Player[] public players;
     Bet[] public bets;
 
     event BetResult(Result _status, address _address, uint256 _amount);
-    event BetPlaced(bool _status, uint256 totalBet, uint256 numberOfPlayers);
+    event BetPlaced(Bet lastBet);
     event BetEnded(Bet lastBet);
 
     modifier onlyOwner() {
@@ -110,11 +110,11 @@ contract ChoHanCasino {
             payable(msg.sender)
         );
         players.push(newPlayer);
-        PlayersInfo[msg.sender] = newPlayer;
+        playersInfo[msg.sender] = newPlayer;
         numberOfPlayers = players.length;
         bets[currentBetId].numberOfPlayers += players.length;
         bets[currentBetId].totalBet += msg.value;
-        emit BetPlaced(true, bets[currentBetId].totalBet, numberOfPlayers);
+        emit BetPlaced(bets[currentBetId]);
         return true;
     }
 
@@ -172,7 +172,7 @@ contract ChoHanCasino {
                 losers[numberOfLosers] = players[i];
                 numberOfLosers++;
             }
-            delete PlayersInfo[players[i].playerAddress];
+            delete playersInfo[players[i].playerAddress];
             delete players[i];
         }
 

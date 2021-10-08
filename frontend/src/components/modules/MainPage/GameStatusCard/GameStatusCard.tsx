@@ -30,7 +30,7 @@ function DataRow({
 }: {
   label: string;
   unit?: string;
-  value: number;
+  value: number | string;
 }) {
   const classes = useStyles();
 
